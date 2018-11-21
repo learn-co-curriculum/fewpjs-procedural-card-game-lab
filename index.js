@@ -1,12 +1,15 @@
-document.addEventListener( "DOMContentLoaded", function () {
-  fetchDeck()
-} )
+function addImageToDOM( source, alt ) {
+  let image = document.createElement( 'img' )
+  image.src = source
+  image.alt = alt
+  document.querySelector( 'section' ).appendChild( image )
+}
 
-function fetchDeck() {
-  fetch( 'https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1' )
+function fetchCard( deck_id ) {
+  fetch( `https://deckofcardsapi.com/api/deck/${deck_id}/draw/?count=1` )
     .then( res => res.json() )
     .then( json => {
-      setupGame( json )
+      addImageToDOM( json.cards[ 0 ].image, json.cards[ 0 ].code )
     } )
 }
 
@@ -16,16 +19,15 @@ function setupGame( deck ) {
   } )
 }
 
-function fetchCard( deck_id ) {
-  fetch( `https://deckofcardsapi.com/api/deck/${deck_id}/draw/?count=1` )
+
+function fetchDeck() {
+  fetch( 'https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1' )
     .then( res => res.json() )
     .then( json => {
-      addCardToDOM( json.cards[ 0 ] )
+      setupGame( json )
     } )
 }
 
-function addCardToDOM( card ) {
-  let image = document.createElement( 'img' )
-  image.src = card.image
-  document.querySelector( 'section' ).appendChild( image )
-}
+document.addEventListener( "DOMContentLoaded", function () {
+  fetchDeck()
+} )

@@ -16,13 +16,9 @@
     "jsdom": "9.2.1",
     "mocha": "5.2.0",
     "mocha-jsdom": "~1.1.0",
-    "mocha-multi": "1.0.1"
-  },
-  "dependencies": {
+    "mocha-multi": "1.0.1",
     "chai-spies": "^1.0.0",
-    "fetch-mock": "^7.2.5",
     "nock": "^10.0.2",
     "node-fetch": "^2.3.0",
-    "sinon": "^7.1.1"
   }
 }

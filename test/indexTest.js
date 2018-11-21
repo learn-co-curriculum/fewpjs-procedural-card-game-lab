@@ -2,25 +2,29 @@ const chai = require( 'chai' );
 const spies = require( 'chai-spies' );
 const path = require( 'path' )
 const fs = require( 'file-system' )
-const sinon = require( 'sinon' )
 var nock = require( 'nock' );
-
 chai.use( spies );
 
-var simulateClick = function ( elem ) {
-  // Create our event (with options)
-  var evt = new MouseEvent( 'click', {
-    bubbles: true,
-    cancelable: true,
-    view: window
-  } );
-  // If cancelled, don't dispatch our event
-  var canceled = !elem.dispatchEvent( evt );
-};
+describe( 'index.js', function () {
+  it( 'includes an event listener for DOMContentLoaded', async function () {
+    const js = await fs.readFileSync( path.resolve( __dirname, '..', 'index.js' ), 'utf-8' )
 
-describe( 'index.js', () => {
-  describe( 'fetchDeck()', () => {
-    it( 'sends a fetch request to get a new deck of cards', async () => {
+    expect( js ).to.match( /document.addEventListener\(( |)"DOMContentLoaded"/ )
+  } )
+
+  describe( 'addImageToDOM(source, alt)', function () {
+    it( 'adds an `img` element to the DOM displaying the correct card', function () {
+      let source = "playingcard.png"
+      let alt = "playing card"
+      expect( document.getElementsByTagName( 'img' ).length, "No images should be present in the initial HTML content" ).to.equal( 0 )
+      addImageToDOM( source, alt )
+      expect( document.getElementsByTagName( 'img' ).length ).to.equal( 1 )
+      expect( document.querySelector( 'img' ).src ).to.equal( "playingcard.png" )
+    } )
+  } )
+
+  describe( 'fetchDeck()', function () {
+    it( 'sends a fetch request to get a new deck of cards', async function () {
       window.fetch = require( 'node-fetch' );
       nock( 'https://deckofcardsapi.com' )
         .get( '/api/deck/new/shuffle/?deck_count=1' )
@@ -36,11 +40,12 @@ describe( 'index.js', () => {
       await fetchDeck()
 
       expect( window.fetch, "A fetch to the API was not found" ).to.have.been.called.with( 'https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1' )
+      expect( window.fetch ).to.have.been.called.exactly( 1 )
     } )
   } )
 
-  describe( 'fetchCard(deck_id)', () => {
-    it( 'sends a fetch request to get a single card, using the deckID passed in', async () => {
+  describe( 'fetchCard(deck_id)', function () {
+    it( 'sends a fetch request to get a single card, using the deckID passed in', async function () {
       window.fetch = require( 'node-fetch' );
 
       nock( 'https://deckofcardsapi.com' )
@@ -61,18 +66,11 @@ describe( 'index.js', () => {
 
       await fetchCard( "testDeckID" )
       expect( window.fetch, "A fetch to the API was not found" ).to.have.been.called.with( 'https://deckofcardsapi.com/api/deck/testDeckID/draw/?count=1' )
+      expect( window.fetch ).to.have.been.called.exactly( 1 )
     } )
   } )
 
-  it( 'displays a new card when the "Deal Card" button is clicked', () => {
-    card = {
-      image: "astronaut.png"
-    }
-    expect( document.getElementsByTagName( 'img' ).length, "No images should be present in the initial HTML content" ).to.equal( 0 )
-    addCardToDOM( card )
-    expect( document.getElementsByTagName( 'img' ).length ).to.equal( 1 )
 
-  } )
 
 
 } )
